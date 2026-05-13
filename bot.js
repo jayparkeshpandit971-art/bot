@@ -119,7 +119,7 @@ bot.on('message', async (msg)=>{
   try{
     if(userId === OWNER_ID) return;
 
-    const member = await bot.getChatMember(chatId,userId);
+    const member = await bot.getChatMember(chatId, userId);
     if(member.status === "administrator" || member.status === "creator") return;
 
     let isSpam = false;
@@ -129,23 +129,23 @@ bot.on('message', async (msg)=>{
     }
 
     const now = Date.now();
-    if(!userMsgCount[userId]) userMsgCount[userId]=0;
+    if(!userMsgCount[userId]) userMsgCount[userId] = 0;
 
     if(now - (lastMsgTime[userId] || 0) < 2000){
       userMsgCount[userId]++;
     } else {
-      userMsgCount[userId]=1;
+      userMsgCount[userId] = 1;
     }
 
-    lastMsgTime[userId]=now;
+    lastMsgTime[userId] = now;
 
     if(userMsgCount[userId] > 5){
       isSpam = true;
     }
 
     if(
-      promoWords.some(w=>text.includes(w)) ||
-      badWords.some(w=>text.includes(w)) ||
+      promoWords.some(w => text.includes(w)) ||
+      badWords.some(w => text.includes(w)) ||
       text.includes("http") ||
       text.includes("www")
     ){
@@ -157,15 +157,15 @@ bot.on('message', async (msg)=>{
     }
 
     if(isSpam){
-      await bot.deleteMessage(chatId,msg.message_id);
+      await bot.deleteMessage(chatId, msg.message_id);
 
-      if(!warnings[userId]) warnings[userId]=0;
+      if(!warnings[userId]) warnings[userId] = 0;
       warnings[userId]++;
 
       const btn = {
         reply_markup:{
           inline_keyboard:[
-            [{text:"❌ Cancel Warning",callback_data:`clear_${userId}`}]
+            [{text:"❌ Cancel Warning", callback_data:`clear_${userId}`}]
           ]
         }
       };
@@ -175,16 +175,16 @@ bot.on('message', async (msg)=>{
         btn
       );
 
-      if(warnings[userId]>=5){
-        await bot.restrictChatMember(chatId,userId,{
-          permissions:{can_send_messages:false},
+      if(warnings[userId] >= 5){
+        await bot.restrictChatMember(chatId, userId,{
+          permissions:{can_send_messages: false},
           until_date: Math.floor(Date.now()/1000)+(24*60*60)
         });
 
-        const muteBtn={
+        const muteBtn = {
           reply_markup:{
             inline_keyboard:[
-              [{text:"🔓 Unmute",callback_data:`unmute_${userId}`}]
+              [{text:"🔓 Unmute", callback_data:`unmute_${userId}`}]
             ]
           }
         };
@@ -194,7 +194,7 @@ bot.on('message', async (msg)=>{
           muteBtn
         );
 
-        warnings[userId]=0;
+        warnings[userId] = 0;
       }
     }
 
@@ -202,32 +202,34 @@ bot.on('message', async (msg)=>{
 });
 
 bot.on('callback_query', async (q)=>{
-  const data=q.data;
-  const chatId=q.message.chat.id;
+  const data = q.data;
+  const chatId = q.message.chat.id;
 
   if(data.startsWith("clear_")){
-    const uid=data.split("_")[1];
-    warnings[uid]=0;
-    bot.answerCallbackQuery(q.id,{text:"Warning cleared"});
+    const uid = data.split("_")[1];
+    warnings[uid] = 0;
+    bot.answerCallbackQuery(q.id,{text:"Warning cleared ✅"});
   }
 
   if(data.startsWith("unmute_")){
-    const uid=data.split("_")[1];
-    await bot.restrictChatMember(chatId,uid,{
-      permissions:{can_send_messages:true}
+    const uid = data.split("_")[1];
+    await bot.restrictChatMember(chatId, uid,{
+      permissions:{can_send_messages: true}
     });
-    bot.answerCallbackQuery(q.id,{text:"User unmuted"});
+    bot.answerCallbackQuery(q.id,{text:"User unmuted ✅"});
   }
 });
 
-bot.onText(/\/unmute (\d+)/, async (msg,match)=>{
-  await bot.restrictChatMember(msg.chat.id,match[1],{
-    permissions:{can_send_messages:true}
+bot.onText(/\/unmute (\d+)/, async (msg, match)=>{
+  await bot.restrictChatMember(msg.chat.id, match[1],{
+    permissions:{can_send_messages: true}
   });
-  bot.sendMessage(msg.chat.id,"Unmuted");
+  bot.sendMessage(msg.chat.id,"✅ Unmuted");
 });
 
-bot.onText(/\/clearwarn (\d+)/,(msg,match)=>{
-  warnings[match[1]]=0;
-  bot.sendMessage(msg.chat.id,"Warnings cleared");
+bot.onText(/\/clearwarn (\d+)/, (msg, match)=>{
+  warnings[match[1]] = 0;
+  bot.sendMessage(msg.chat.id,"✅ Warnings cleared");
 });
+
+console.log("🤖 AI Studio Bot Started!");
