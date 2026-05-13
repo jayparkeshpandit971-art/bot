@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
-const token = process.env.BOT_TOKEN;
+const token = '8889076766:AAFT9GLvpNcgMG8ZnekBk8T7UPydESJINyg';
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -232,9 +232,10 @@ bot.onText(/\/clearwarn (\d+)/, (msg, match)=>{
   bot.sendMessage(msg.chat.id,"✅ Warnings cleared");
 });
 
-console.log("🤖 AI Studio Bot Started!");
 const http = require('http');
 http.createServer((req, res) => {
   res.write('Bot is alive!');
   res.end();
 }).listen(process.env.PORT || 3000);
+
+console.log("🤖 AI Studio Bot Started!");
